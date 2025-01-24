@@ -92,10 +92,14 @@ class Router
       // Split the current URI into segments
       $uriSegments = explode('/', trim($uri, '/'));
 
+      
+
       // Split the route URI into segments
       $routeSegments = explode('/', trim($route['uri'], '/'));
 
       $match = true;
+
+   
 
       // Check if the number of segments matches
       if (count($uriSegments) === count($routeSegments) && strtoupper($route['method'] === $requestMethod)) {
@@ -114,6 +118,7 @@ class Router
           if (preg_match('/\{(.+?)\}/', $routeSegments[$i], $matches)) {
             $params[$matches[1]] = $uriSegments[$i];
           }
+         // inspect($uriSegments[$i]);
         }
 
         if ($match) {

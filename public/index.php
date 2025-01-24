@@ -28,9 +28,8 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 //inspectAndDie($uri);
 
-$method = $_SERVER['REQUEST_METHOD'];
 
-$router->route($uri, $method);
+$router->route($uri);
 
 //inspect($uri);
 //inspect($method);
