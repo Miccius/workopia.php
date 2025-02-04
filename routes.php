@@ -14,6 +14,8 @@ $router->get('/auth/login', 'UserController@login');
 
 $router->post('/auth/register', 'UserController@store');
 
+$router->post('auth/logout', 'UserController@logout');
+
 /*
 $router->get('/', 'controllers/home.php');
 $router->get('/listings', 'controllers/listings/index.php');

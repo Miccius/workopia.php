@@ -1,9 +1,15 @@
 <?php
 session_start();
-require '../helpers.php';
+
 require __DIR__ . '/../vendor/autoload.php';
 
 use Framework\Router;
+use Framework\Session;
+
+Session::start();
+
+require '../helpers.php';
+
 
 //require basePath('Framework/Router.php');
 //require basePath('Framework?databese.php');
