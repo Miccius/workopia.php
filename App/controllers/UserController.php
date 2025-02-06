@@ -141,5 +141,70 @@ public function logout()
   redirect('/');
 }
 
+/**
+ * 
+ * @return void
+ */
+public function authenticate() {
+
+  $email = $_POST['email'];
+  $password = $_POST['password'];
+
+  $errors = [];
+
+  //validation
+  if(!Validation::email($email)) {
+
+    $errors['email'] = 'Please enter a valid email';
+  }
+if(!Validation::string($password, 6, 50)) {
+
+  $errors['password'] = 'Passwoed must be at least 6 characters';
+
+  } 
+
+  //Check for errors
+if(!empty($errors)) {
+  loadView('users/login', ['errors' => $errors]);
+  exit;
+}
+
+//check for email
+$params = [
+  'email'=> $email
+];
+
+$user = $this->db->query('SELECT * FROM users WHERE `e-mail` = :email',$params)->fetch();
+
+if(!$user) {
+  $errors['email'] = 'Incorrect credentials';
+  loadView('users/login', ['errors' => $errors]);
+  exit;
+}
+
+//check if password is correct
+if(!password_verify($password, $user->password)) {
+  $errors['email'] = 'Incorrect credentials';
+  loadView('users/login', ['errors' => $errors]);
+  exit;
+}
+
+//Set user session
+Session::set('user', [
+  'id' => $user->Id,
+  'name' => $user->name,
+  'email' => $user->email,
+  'city' => $user->city,
+  'state' => $user->state
+]);
+
+
+redirect('/');
+
+}
+  
+ 
+
+
 
 }
