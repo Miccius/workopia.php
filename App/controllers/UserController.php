@@ -81,24 +81,23 @@ class UserController
       ]);
       exit;
     }
-    
-    // Check if email exists
 
+    // Check if email exists
     $params = [
       'email' => $email
     ];
 
     $user = $this->db->query('SELECT * FROM users WHERE `e-mail` = :email', $params)->fetch();
 
-    if($user) {
-      $errors['email'] = "That email already exists";
+    if ($user) {
+      $errors['email'] = 'That email already exists';
       loadView('users/create', [
         'errors' => $errors
       ]);
       exit;
     }
 
-    //Create user account
+    // Create user account
     $params = [
       'name' => $name,
       'email' => $email,
@@ -109,9 +108,10 @@ class UserController
 
     $this->db->query('INSERT INTO users (name, `e-mail`, city, state, password) VALUES (:name, :email, :city, :state, :password)', $params);
 
-    //Get new user ID
+    // Get new user ID
     $userId = $this->db->conn->lastInsertId();
 
+    // Set user session
     Session::set('user', [
       'id' => $userId,
       'name' => $name,
@@ -120,91 +120,87 @@ class UserController
       'state' => $state
     ]);
 
-    //inspectAndDie(Session::get('user'));
 
     redirect('/');
-
   }
 
-/**
- * Logout a user and kill session
- * 
- * @return void
- */
-public function logout()
-{
-  Session::clearAll();
+  /**
+   * Logout a user and kill session
+   * 
+   * @return void
+   */
+  public function logout()
+  {
+    Session::clearAll();
 
-  $params = session_get_cookie_params();
-  setcookie('PHPSESSID', '', TIME() - 86400, $params['path'], $params['domain']);
+    $params = session_get_cookie_params();
+    setcookie('PHPSESSID', '', time() - 86400, $params['path'], $params['domain']);
 
-  redirect('/');
-}
-
-/**
- * 
- * @return void
- */
-public function authenticate() {
-
-  $email = $_POST['email'];
-  $password = $_POST['password'];
-
-  $errors = [];
-
-  //validation
-  if(!Validation::email($email)) {
-
-    $errors['email'] = 'Please enter a valid email';
+    redirect('/');
   }
-if(!Validation::string($password, 6, 50)) {
 
-  $errors['password'] = 'Passwoed must be at least 6 characters';
+  /**
+   * Authenticate a user with email and password
+   * 
+   * @return void
+   */
+  public function authenticate()
+  {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-  } 
+    $errors = [];
 
-  //Check for errors
-if(!empty($errors)) {
-  loadView('users/login', ['errors' => $errors]);
-  exit;
-}
+    // Validation
+    if (!Validation::email($email)) {
+      $errors['email'] = 'Please enter a valid email';
+    }
 
-//check for email
-$params = [
-  'email'=> $email
-];
+    if (!Validation::string($password, 6, 50)) {
+      $errors['password'] = 'Password must be at least 6 characters';
+    }
 
-$user = $this->db->query('SELECT * FROM users WHERE `e-mail` = :email',$params)->fetch();
+    // Check for errors
+    if (!empty($errors)) {
+      loadView('users/login', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
 
-if(!$user) {
-  $errors['email'] = 'Incorrect credentials';
-  loadView('users/login', ['errors' => $errors]);
-  exit;
-}
+    // Check for email
+    $params = [
+      'email' => $email
+    ];
 
-//check if password is correct
-if(!password_verify($password, $user->password)) {
-  $errors['email'] = 'Incorrect credentials';
-  loadView('users/login', ['errors' => $errors]);
-  exit;
-}
+    $user = $this->db->query('SELECT * FROM users WHERE `e-mail` = :email', $params)->fetch();
 
-//Set user session
-Session::set('user', [
-  'id' => $user->Id,
-  'name' => $user->name,
-  'email' => $user->email,
-  'city' => $user->city,
-  'state' => $user->state
-]);
+    if (!$user) {
+      $errors['email'] = 'Incorrect credentials';
+      loadView('users/login', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
 
+    // Check if password is correct
+    if (!password_verify($password, $user->password)) {
+      $errors['email'] = 'Incorrect credentials';
+      loadView('users/login', [
+        'errors' => $errors
+      ]);
+      exit;
+    }
 
-redirect('/');
+    // Set user session
+    Session::set('user', [
+      'id' => $user->id,
+      'name' => $user->name,
+      'email' => $user->email,
+      'city' => $user->city,
+      'state' => $user->state
+    ]);
 
-}
-  
- 
-
-
-
+    redirect('/');
+  }
 }
